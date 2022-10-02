@@ -146,23 +146,16 @@ resource "aws_lb_listener" "listener_app_notify" {
   }
 }
 
-data "aws_caller_identity" "current" {}
-
-resource "aws_vpc_endpoint_service" "example" {
-  acceptance_required        = false
-  allowed_principals         = [data.aws_caller_identity.current.arn]
-  application_load_balancer_arns = [aws_lb.lb_app_notify.arn]
-}
-
-resource "aws_vpc_endpoint" "example" {
-  service_name      = aws_vpc_endpoint_service.example.service_name
-  subnet_ids        = [var.sn_pub_1a_id, var.sn_pub_1c_id]
-  vpc_endpoint_type = aws_vpc_endpoint_service.example.service_type
+resource "aws_vpc_endpoint" "ec2" {
   vpc_id            = var.vpc_id
-}
+  service_name      = "com.amazonaws.us-west-2.ec2"
+  vpc_endpoint_type = "Interface"
 
-locals {
-  phone_numbers = ["+5511981928324"]
+  security_group_ids = [
+    aws_security_group.sg_pub.id,
+  ]
+
+  private_dns_enabled = true
 }
 
 resource "aws_sns_topic" "topic" {
@@ -187,8 +180,7 @@ resource "aws_sns_topic" "topic" {
 }
 
 resource "aws_sns_topic_subscription" "topic_sms_subscription" {
-  count     = length(local.phone_numbers)
   topic_arn = aws_sns_topic.topic.arn
   protocol  = "sms"
-  endpoint  = local.phone_numbers[count.index]
+  endpoint  = aws_vpc_endpoint.ec2.id
 }

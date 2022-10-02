@@ -55,7 +55,3 @@ variable "password" {
 variable "family" {
   default     = "mysql8.0"
 }
-
-variable "db_name" {
-  default     = "notifier"
-}

@@ -1,0 +1,18 @@
+name: Terraform Destroy
+
+on: [push]
+jobs:
+  issue_parser:
+    runs-on: ubuntu-latest
+    name: Terraform destroy
+    steps:
+    - name: Terraform destroy
+      env:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: us-east-1
+      uses: albertyc4/terraform-destroy-actions@v3
+      with:
+        org_name: 'albertyc4'
+        repo_name: 'Checkpoint3-2'

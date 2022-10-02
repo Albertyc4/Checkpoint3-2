@@ -145,6 +145,7 @@ resource "aws_lb_listener" "listener_app_notify" {
     target_group_arn = aws_lb_target_group.tg_app_notify.arn
   }
 }
+<<<<<<< HEAD
 
 resource "aws_vpc_endpoint" "ec2" {
   vpc_id            = var.vpc_id
@@ -184,3 +185,5 @@ resource "aws_sns_topic_subscription" "topic_sms_subscription" {
   protocol  = "sms"
   endpoint  = aws_vpc_endpoint.ec2.id
 }
+=======
+>>>>>>> 042d5ae12fc458dc6c18ed0239508f6032d1e1d7

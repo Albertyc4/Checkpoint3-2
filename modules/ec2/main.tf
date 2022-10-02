@@ -118,7 +118,7 @@ resource "aws_lb" "lb_app_notify" {
   security_groups    = [aws_security_group.sg_pub.id]
 
   tags = {
-    Name = "lb_app_notify"
+    Name = "lb_notify"
   }
 }
 

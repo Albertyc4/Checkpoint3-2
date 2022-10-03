@@ -135,8 +135,8 @@ resource "aws_launch_template" "lt_check3" {
 }
 
 # AUTO SCALING GROUP
-resource "aws_autoscaling_group" "asg_ws" {
-  name                = "asg_ws"
+resource "aws_autoscaling_group" "autosca" {
+  name                = "autoscas"
   vpc_zone_identifier = ["${var.sn_pub_1a_id}", "${var.sn_pub_1c_id}"]
   desired_capacity    = var.desired_capacity
   min_size            = var.min_size

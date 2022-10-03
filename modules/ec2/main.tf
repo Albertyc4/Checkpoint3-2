@@ -94,8 +94,8 @@ resource "aws_lb_listener" "listener_app_notify" {
 resource "aws_lb" "elb_ws" {
   name               = "elb-ws"
   load_balancer_type = "application"
-  subnets            = [var.sn_vpc10_pub_1a_id, var.sn_vpc10_pub_1c_id]
-  security_groups    = [aws_security_group.vpc10_sg_pub.id]
+  subnets            = [var.sn_pub_1a_id, var.sn_pub_1c_id]
+  security_groups    = [aws_security_group.sg_pub.id]
 
   tags = {
     Name = "lb_app_notify"
@@ -104,7 +104,7 @@ resource "aws_lb" "elb_ws" {
 
 # EC2 LAUNCH TEMPLATE
 data "template_file" "user_data" {
-  template = file("./app/userdata-notifier.sh")
+  template = file("./modules/ec2/userdata-notifier.sh")
   vars = {
     rds_endpoint = "${var.rds_endpoint}"
     rds_user     = "${var.rds_user}"
@@ -117,7 +117,7 @@ resource "aws_launch_template" "lt_check3" {
   name                   = "lt_check3"
   image_id               = var.ami
   instance_type          = var.instance_type
-  vpc_security_group_ids = [aws_security_group.vpc10_sg_pub.id]
+  vpc_security_group_ids = [aws_security_group.sg_pub.id]
   key_name               = var.ssh_key
   user_data              = base64encode(data.template_file.user_data.rendered)
 
@@ -137,7 +137,7 @@ resource "aws_launch_template" "lt_check3" {
 # AUTO SCALING GROUP
 resource "aws_autoscaling_group" "asg_ws" {
   name                = "asg_ws"
-  vpc_zone_identifier = ["${var.sn_vpc10_pub_1a_id}", "${var.sn_vpc10_pub_1c_id}"]
+  vpc_zone_identifier = ["${var.sn_pub_1a_id}", "${var.sn_pub_1c_id}"]
   desired_capacity    = var.desired_capacity
   min_size            = var.min_size
   max_size            = var.max_size

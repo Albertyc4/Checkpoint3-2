@@ -77,8 +77,8 @@ data "template_file" "user_data" {
   }
 }
 
-resource "aws_launch_template" "lt_app_notify" {
-  name                   = "lt_app_notify"
+resource "aws_launch_template" "template" {
+  name                   = "template"
   image_id               = var.ami
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.sg_pub.id]
@@ -89,59 +89,59 @@ resource "aws_launch_template" "lt_app_notify" {
   tag_specifications {
     resource_type = "instance"
     tags = {
-      Name = "app_notify"
+      Name = "template"
     }
   }
 }
 
 # AUTO SCALING GROUP
-resource "aws_autoscaling_group" "asg_app_notify" {
-  name                = "asg_app_notify"
+resource "aws_autoscaling_group" "autoscal" {
+  name                = "autoscal"
   vpc_zone_identifier = ["${var.sn_pub_1a_id}", "${var.sn_pub_1c_id}"]
   desired_capacity    = var.desired_capacity
   min_size            = var.min_size
   max_size            = var.max_size
-  target_group_arns   = [aws_lb_target_group.tg_app_notify.arn]
+  target_group_arns   = [aws_lb_target_group.targetg.arn]
 
   launch_template {
-    id      = aws_launch_template.lt_app_notify.id
+    id      = aws_launch_template.template.id
     version = "$Latest"
   }
 
 }
 
 # APPLICATION LOAD BALANCER
-resource "aws_lb" "lb_app_notify" {
-  name               = "lb-app-notify"
+resource "aws_lb" "loadb" {
+  name               = "loadb"
   load_balancer_type = "application"
   subnets            = [var.sn_pub_1a_id, var.sn_pub_1c_id]
   security_groups    = [aws_security_group.sg_pub.id]
 
   tags = {
-    Name = "lb_notify"
+    Name = "loadb"
   }
 }
 
 # APPLICATION LOAD BALANCER TARGET GROUP
-resource "aws_lb_target_group" "tg_app_notify" {
-  name     = "tg-app-notify"
+resource "aws_lb_target_group" "targetg" {
+  name     = "targetg"
   vpc_id   = var.vpc_id
   protocol = var.protocol
   port     = var.port
 
   tags = {
-    Name = "tg_app_notify"
+    Name = "targetg"
   }
 }
 
 # APPLICATION LOAD BALANCER LISTENER
-resource "aws_lb_listener" "listener_app_notify" {
-  load_balancer_arn = aws_lb.lb_app_notify.arn
+resource "aws_lb_listener" "listener" {
+  load_balancer_arn = aws_lb.loadb.arn
   protocol          = var.protocol
   port              = var.port
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tg_app_notify.arn
+    target_group_arn = aws_lb_target_group.targetg.arn
   }
 }

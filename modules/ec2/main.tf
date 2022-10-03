@@ -66,34 +66,6 @@ resource "aws_security_group" "sg_priv" {
   }
 }
 
-# EC2 LAUNCH TEMPLATE
-data "template_file" "user_data" {
-  template = file("./modules/ec2/userdata-notifier.sh")
-  vars = {
-    rds_endpoint = "${var.rds_endpoint}"
-    rds_user     = "${var.rds_user}"
-    rds_password = "${var.rds_password}"
-    rds_name     = "${var.rds_name}"
-  }
-}
-
-resource "aws_launch_template" "template" {
-  name                   = "template"
-  image_id               = var.ami
-  instance_type          = var.instance_type
-  vpc_security_group_ids = [aws_security_group.sg_pub.id]
-  key_name               = var.ssh_key
-  user_data              = base64encode(data.template_file.user_data.rendered)
-
-
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name = "template"
-    }
-  }
-}
-
 # APPLICATION LOAD BALANCER TARGET GROUP
 resource "aws_lb_target_group" "tg_app_notify" {
   name     = "tg-app-notify"
